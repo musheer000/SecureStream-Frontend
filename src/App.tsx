@@ -167,7 +167,7 @@ export function AppInner({ theme, toggleTheme, isDark, colors }: ThemeProps) {
         refreshToken: !!data.refreshToken,
       }));
 
-      setStatusLog(`SUCCESS: Authentication Verified!\n✓ BCrypt password check passed\n✓ Issued Bearer Access Token & Redis Session Refresh Token`);
+      setStatusLog(`SUCCESS: Authentication Verified!\n✅ BCrypt password check passed\n✅ Issued Bearer Access Token & Redis Session Refresh Token`);
       setApiResponse(JSON.stringify(data, null, 2));
     } catch (err: any) {
       setIsShaking(true);
@@ -175,12 +175,16 @@ export function AppInner({ theme, toggleTheme, isDark, colors }: ThemeProps) {
       
       const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message;
       const isLocked = errorMsg.includes('locked');
+      const isColdStart = errorMsg.includes('Network Error') || errorMsg.includes('timeout') || err.response?.status === 502 || err.response?.status === 503;
+      
       if (isLocked) {
         setStatusLog(`CRITICAL ERROR: Account Locked! Maximum failed attempts exceeded.`);
+      } else if (isColdStart) {
+        setStatusLog(`INFO: Server is waking up from sleep mode (Render Free Tier). Please wait 30 seconds and try again!`);
       } else {
-        setStatusLog(`ERROR: Authentication Failed - ${errorMsg}`);
+        setStatusLog(`SECURITY ALERT: Authentication Failed. Validation rejected.\nReason: ${errorMsg}`);
       }
-      setApiResponse(JSON.stringify(err.response?.data || { error: err.message }, null, 2));
+      setApiResponse(`{ "error": "${errorMsg}" }`);
     } finally {
       setIsAuthLoading(false);
     }
