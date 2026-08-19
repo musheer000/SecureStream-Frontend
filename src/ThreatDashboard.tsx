@@ -99,7 +99,7 @@ export default function ThreatDashboard({ orgId, userRole, username, onResolve }
   useEffect(() => {
     const token = getAccessToken();
     const client = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8080/ws-threats") as any,
+      webSocketFactory: () => new (typeof SockJS === 'function' ? SockJS : (SockJS as any).default)((import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'https://securestream-backend.onrender.com') + '/ws-threats') as any,
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
       onConnect: () => {

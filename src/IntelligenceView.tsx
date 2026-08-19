@@ -199,7 +199,7 @@ export default function IntelligenceView({ orgId, userRole }: { orgId: number; u
     const token = getAccessToken();
     if (!token) return;
     const client = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8080/ws-threats"),
+      webSocketFactory: () => new (typeof SockJS === 'function' ? SockJS : (SockJS as any).default)((import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'https://securestream-backend.onrender.com') + '/ws-threats'),
       connectHeaders: { Authorization: `Bearer ${token}` },
       onConnect: () => {
         client.subscribe(`/topic/intelligence/${orgId}`, (msg) => {
