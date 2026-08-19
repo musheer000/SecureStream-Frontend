@@ -57,7 +57,7 @@ export default function NotificationBell({ orgId }: Props) {
 
   /* ─── WebSocket live feed ─────────────────────────────────── */
   useEffect(() => {
-    const sock   = new SockJS('http://localhost:8080/ws-threats');
+    const sock   = new (typeof SockJS === 'function' ? SockJS : (SockJS as any).default)((import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'https://securestream-backend.onrender.com') + '/ws-threats');
     const client = new Client({
       webSocketFactory: () => sock as any,
       debug: () => {},

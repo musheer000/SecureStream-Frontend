@@ -95,7 +95,7 @@ export default function ComplianceDashboard({ orgId }: Props) {
 
   // Live updates every 30 seconds via WebSocket
   useEffect(() => {
-    const socket = new SockJS('http://localhost:8080/ws-threats');
+    const socket = new (typeof SockJS === 'function' ? SockJS : (SockJS as any).default)((import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'https://securestream-backend.onrender.com') + '/ws-threats');
     const client = new Client({
       webSocketFactory: () => socket as any,
       debug: () => {},
